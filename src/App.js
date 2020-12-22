@@ -1,68 +1,70 @@
 import React from "react";
-import PropTypes from "prop-types";
+import axios from "axios";
+import Album from "./Album";
+import "./App.css";
 
-function Music({id, name, rating, image}) {
-    return (
-        <div>
-            <center>
-                <h3>
-                    {id}번째 Album : {name} <br/>
-                    rating : {rating} / 10.0
-                </h3>
-                <img src={image} alt={name} />
-            </center>
-        </div>
-    );
-}
-
-const covers = [
-    {
-        id: 1,
-        name: "Future Nostalgia",
-        image: "/images/1.jpg",
-        rating: 7.6
-    },
-    {
-        id: 2,
-        name: "The New Abnormal",
-        image: "/images/2.jpg",
-        rating: 8.4
-    },
-    {
-        id: 3,
-        name: "Punisher",
-        image: "/images/3.jpg",
-        rating: 7.0
+class App extends React.Component {
+    state = {
+        isLoading: true,
+        albums : []
     }
-];
 
-Music.propTypes = {
-    id : PropTypes.number.isRequired,
-    name : PropTypes.string.isRequired,
-    rating : PropTypes.number.isRequired,
-    image : PropTypes.string.isRequired
-};
+    getAlbums = async () => {
+        var url = "http://moonmusic.duckdns.org:8081/api/albums";
+        const albums = await axios.get(url);
+        this.setState({albums: albums.data, isLoading: false});
+    }
 
-function App() {
-  return (
-    <div className="App">
-        <h1>
-            <center>대중 음악의 이해</center>
-        </h1>
-        <h2>
-            <center>정기 음평회</center>
-        </h2>
-        {covers.map(cover => 
-            <Music
-                key={cover.id} 
-                id={cover.id}
-                name={cover.name}
-                rating={cover.rating}
-                image={cover.image}
-            />
-        )}
-    </div>
-  );
+    constructor(props) {
+        super(props);
+
+        const meta = document.createElement('meta');
+        meta.name = "viewport";
+        meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
+        document.getElementsByTagName('head')[0].appendChild(meta);
+    }
+
+    componentDidMount() {
+        document.title = "정기음평회 History Webpage";
+	this.getAlbums();
+    }
+
+    render() {
+        const { isLoading, albums } = this.state;
+        return (
+            <section className = "container">
+                <div className = "web_title">
+                        <h1>
+                            대중 음악의 이해
+                        </h1>
+                        <h2>
+                            정기 음평회 History
+                        </h2>
+                </div>
+                {isLoading ? (
+                    <div className = "loader">
+                        <span className ="loader__text">Loading...</span>
+                    </div>
+                ) : (
+                    <div className = "albums">
+                        {albums.map(album => (
+                            <Album 
+                                key = {album.id}
+                                id = {album.id}
+                                name = {album.name}
+                                artist = {album.artist}
+                                genre = {album.genre}
+                                nation = {album.nation}
+                                year = {album.year}
+                                volume = {album.volume}
+                                rating = {album.rating}
+                            />
+                        ))}
+                    </div>
+                )}
+            </section>
+        )
+    }
 }
 
 export default App;
