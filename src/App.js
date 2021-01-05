@@ -34,12 +34,14 @@ class App extends React.Component {
         return (
             <section className = "container">
                 <div className = "web_title">
+                    <center>
                         <h1>
                             대중 음악의 이해
                         </h1>
                         <h2>
                             정기 음평회 History
                         </h2>
+                    </center>
                 </div>
                 {isLoading ? (
                     <div className = "loader">
